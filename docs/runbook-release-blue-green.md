@@ -18,6 +18,14 @@ This runbook describes how to safely perform a blue/green release of the online 
   - CloudWatch dashboards and alarms in place (availability, latency, error rate). 
 
 ---
+### Environments
+
+For this runbook, the following naming is used:
+
+- Blue (current production): `digital-channels-web-blue`
+- Green (new version to be promoted): `digital-channels-web-green`
+- Shared backend API environment: `digital-channels-api-env`
+---
 
 ## 3. Release Criteria
 
