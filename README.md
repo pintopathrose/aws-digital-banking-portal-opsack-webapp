@@ -158,13 +158,5 @@ In particular:
   - Handling a login outage (one of the highest‑impact issues in digital channels).
   - Safely rolling out new versions via blue/green deployment and rolling back if necessary.
 
-When referenced in a CV or portfolio, this project can be described as a small but realistic example of **operating a banking digital channel on AWS**, emphasizing both architecture and day‑2 operations.
 
----
-
-## Getting Started (High-Level)
-
-> Adjust this section to match your actual tech stack and deployment scripts.
-
-1. **Clone the repository**
 
