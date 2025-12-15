@@ -39,6 +39,7 @@ For Elastic Beanstalk, you set them in the environment configuration in the AWS 
 1. Clone the repository (if you have not already):
 
 git clone https://github.com/pintopathrose/aws-digital-banking-portal-opsack-webapp.git
+
 cd aws-digital-banking-portal-opsack-webapp/userreg-api-node-beanstalk
 
 2. Install dependencies:
