@@ -22,7 +22,9 @@ At a high level, this repository is split into three parts:
 This is a high-level overview of how to run this project in AWS. See the READMEs inside each folder for detailed steps.
 
 1. **Clone the repository to your machine**
+
    git clone https://github.com/pintopathrose/aws-digital-banking-portal-opsack-webapp.git
+
    cd aws-digital-banking-portal-opsack-webapp
 
 3. **Deploy the backend API**
