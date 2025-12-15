@@ -165,6 +165,12 @@ Examples of alarms (tune thresholds for your environment):
 
 All alarms should publish notifications to an SNS topic subscribed by the on‑call engineer (email/Slack/Teams integration).
 
+Example CloudWatch artefacts are provided in `docs/monitoring/`:
+
+- `cloudwatch-dashboard-digitalchannels-health.json` – high-level ALB and environment health dashboard.
+- `cloudwatch-dashboard-digitalchannels-backend.json` – backend (RDS and EC2/Beanstalk) health dashboard.
+- `alarms-example.md` – example CloudWatch alarm definitions for ALB errors, login latency, environment health, and RDS load.
+
 ---
 
 ## Runbooks (Operations Playbooks)
