@@ -4,6 +4,46 @@ This project simulates an online banking digital channel (web portal) running on
 It is designed to be deployable within or close to the AWS Free Tier by using small instance types and low traffic.
 
 ---
+## Repository structure
+
+At a high level, this repository is split into three parts:
+
+- `userreg-api-node-beanstalk`  
+  Node.js backend API that exposes login, account, and transaction endpoints. This is deployed to AWS Elastic Beanstalk as the backend service.
+
+- `userreg-react-beanstalk`  
+  React frontend web application that implements the online banking user interface (login, dashboard, accounts, transactions). This is also deployed to AWS Elastic Beanstalk.
+
+- `docs`  
+  Documentation, including the architecture diagram and operations runbooks (login outage and blue/green release procedures).
+
+## Quickstart (high level)
+
+This is a high-level overview of how to run this project in AWS. See the READMEs inside each folder for detailed steps.
+
+1. **Clone the repository to your machine**
+
+2. **Deploy the backend API**
+- Go into `userreg-api-node-beanstalk/`.
+- Install dependencies and test locally.
+- Deploy to an Elastic Beanstalk environment (for example `digital-channels-api-env`).
+- See `userreg-api-node-beanstalk/README.md` for step-by-step instructions.
+
+3. **Deploy the frontend web app**
+- Go into `userreg-react-beanstalk/`.
+- Install dependencies and test locally.
+- Build and deploy to a separate Elastic Beanstalk environment (for example `digital-channels-web-env`).
+- See `userreg-react-beanstalk/README.md` for step-by-step instructions.
+
+4. **Configure environment variables**
+- In the API environment, configure database connection variables (DB host, user, password, name).
+- In the frontend environment, set the API base URL so the web app calls your deployed backend.
+
+5. **Set up monitoring and alarms**
+- Create CloudWatch dashboards and alarms using the ideas in the “Monitoring & Dashboards” section.
+- Optionally, use the example artefacts in `docs/monitoring/` (if you add them).
+
+---
 
 ## Architecture
 
