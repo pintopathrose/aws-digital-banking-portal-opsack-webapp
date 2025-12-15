@@ -1,1 +1,71 @@
+{
+  "widgets": [
+    {
+      "type": "text",
+      "x": 0,
+      "y": 0,
+      "width": 24,
+      "height": 2,
+      "properties": {
+        "markdown": "# Digital Channels – Health\nHigh-level view of ALB and Elastic Beanstalk environment health."
+      }
+    },
+    {
+      "type": "metric",
+      "x": 0,
+      "y": 2,
+      "width": 12,
+      "height": 6,
+      "properties": {
+        "title": "ALB – Request Count & 5xx",
+        "metrics": [
+          [ "AWS/ApplicationELB", "RequestCount", "LoadBalancer", "your-alb-name" ],
+          [ ".", "HTTPCode_Target_5XX_Count", ".", "." ]
+        ],
+        "stat": "Sum",
+        "region": "your-region",
+        "period": 60,
+        "view": "timeSeries",
+        "stacked": false
+      }
+    },
+    {
+      "type": "metric",
+      "x": 12,
+      "y": 2,
+      "width": 12,
+      "height": 6,
+      "properties": {
+        "title": "ALB – Latency (TargetResponseTime)",
+        "metrics": [
+          [ "AWS/ApplicationELB", "TargetResponseTime", "LoadBalancer", "your-alb-name" ]
+        ],
+        "stat": "p95",
+        "region": "your-region",
+        "period": 60,
+        "view": "timeSeries",
+        "stacked": false
+      }
+    },
+    {
+      "type": "metric",
+      "x": 0,
+      "y": 8,
+      "width": 12,
+      "height": 6,
+      "properties": {
+        "title": "Elastic Beanstalk – Environment Health",
+        "metrics": [
+          [ "AWS/ElasticBeanstalk", "EnvironmentHealth", "EnvironmentName", "digital-channels-api-env" ],
+          [ ".", "EnvironmentHealth", "EnvironmentName", "digital-channels-web-env" ]
+        ],
+        "stat": "Average",
+        "region": "your-region",
+        "period": 60,
+        "view": "timeSeries",
+        "stacked": false
+      }
+    }
+  ]
+}
 
