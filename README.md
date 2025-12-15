@@ -28,7 +28,7 @@ The architecture is a simplified online banking portal hosted on AWS:
 
 The architecture diagram is provided as:
 
-- `docs/architecture-digital-channels.png`
+![Arch](docs/architecture-digital-channels.png)
 
 ---
 
