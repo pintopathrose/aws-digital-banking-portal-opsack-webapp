@@ -1,1 +1,70 @@
+{
+  "widgets": [
+    {
+      "type": "text",
+      "x": 0,
+      "y": 0,
+      "width": 24,
+      "height": 2,
+      "properties": {
+        "markdown": "# Digital Channels – Backend\nDatabase and instance health for the digital banking portal."
+      }
+    },
+    {
+      "type": "metric",
+      "x": 0,
+      "y": 2,
+      "width": 12,
+      "height": 6,
+      "properties": {
+        "title": "RDS – CPU & Connections",
+        "metrics": [
+          [ "AWS/RDS", "CPUUtilization", "DBInstanceIdentifier", "your-rds-identifier" ],
+          [ ".", "DatabaseConnections", ".", "." ]
+        ],
+        "stat": "Average",
+        "region": "your-region",
+        "period": 60,
+        "view": "timeSeries",
+        "stacked": false
+      }
+    },
+    {
+      "type": "metric",
+      "x": 12,
+      "y": 2,
+      "width": 12,
+      "height": 6,
+      "properties": {
+        "title": "EC2/Beanstalk – CPU Utilization",
+        "metrics": [
+          [ "AWS/EC2", "CPUUtilization", "AutoScalingGroupName", "your-asg-name" ]
+        ],
+        "stat": "Average",
+        "region": "your-region",
+        "period": 60,
+        "view": "timeSeries",
+        "stacked": false
+      }
+    },
+    {
+      "type": "metric",
+      "x": 0,
+      "y": 8,
+      "width": 12,
+      "height": 6,
+      "properties": {
+        "title": "RDS – Free Storage Space",
+        "metrics": [
+          [ "AWS/RDS", "FreeStorageSpace", "DBInstanceIdentifier", "your-rds-identifier" ]
+        ],
+        "stat": "Average",
+        "region": "your-region",
+        "period": 300,
+        "view": "timeSeries",
+        "stacked": false
+      }
+    }
+  ]
+}
 
