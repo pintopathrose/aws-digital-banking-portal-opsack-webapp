@@ -1,85 +1,170 @@
-# Deploying and Running a Full Stack Web Application in AWS using Elastic Beanstalk. 
+# Digital Channels – Online Banking Portal on AWS Elastic Beanstalk
 
-This is a simple web application for creating a user registration form and deploying using AWS Elastic Beanstalk. 
+This project simulates an online banking digital channel (web portal) running on AWS Elastic Beanstalk, with a focus on how an operations / SRE engineer would monitor, release, and run it in production.  
+It is designed to be deployable within or close to the AWS Free Tier by using small instance types and low traffic.
 
-This web app is created using React for the Front End and NodeJS for the API's. There are two API's. The first API updates the User Registration information to DynamoDB and the second one publishes an email to the subscribed SNS topic. The SNS topic is susbscribed by Elastic Beanstalk during the creation. The DynamoDB Database is created by using AWS CDK(Cloud Deployment Kit).
+---
 
-![arch](/images/beanstalk-workshop-arch.png) 
+## Architecture
 
-_Please follow the below steps to deploy this app to AWS._
+The architecture is a simplified online banking portal hosted on AWS:
 
-## Development Environment Setup:
+- **Client:** Web browser (and optionally mobile web) accessing a secure HTTPS endpoint.
+- **Edge & routing:**  
+  - Amazon Route 53 for DNS.  
+  - (Optional) Amazon CloudFront as CDN in front of the Application Load Balancer.  
+- **Application layer:**  
+  - AWS Elastic Beanstalk environment (multi‑AZ) running a small web application (e.g., Node.js / Java / Python).  
+  - Auto Scaling across at least two Availability Zones.  
+- **Data layer:**  
+  - Amazon RDS (Multi‑AZ) for core customer/account data.  
+  - (Optional) Amazon DynamoDB for session or profile data.  
+- **Security & reliability services:**  
+  - AWS Certificate Manager (ACM) for TLS certificates.  
+  - IAM roles for least‑privilege access between app and databases.  
+- **Observability & alerts:**  
+  - Amazon CloudWatch for metrics, logs, and dashboards.  
+  - Amazon SNS for alert notifications to on‑call engineers.
 
-1. Install and configure the AWS CLI as per https://docs.aws.amazon.com/cli/latest/userguide/cli-chap-install.html
-2. Install EB CLI as per the AWS Documentation - https://docs.aws.amazon.com/elasticbeanstalk/latest/dg/eb-cli3-install.html
-3. Install CDK by running 'npm install -g aws-cdk' in the terminal
-4. Clone this entire source code
+The architecture diagram is provided as:
 
-  ## Setup Database, ECR and Elsatic Beanstalk IAM roles using CDK.  
+- `docs/architecture-digital-channels.png`
 
-1. 'cd userreg-api-node-beanstalk/cdk'
-1. Run 'npm install'
-1. Run 'npm run build'
-1. Run 'cdk synth'
-1. Run 'cdk deploy'
+---
 
-## React App Setup and Deployment
+## Features
 
-1. 'cd userreg-react-beanstalk'
-2. Install the node dependencies by running 'npm install'
-3. 'npm run start-local' - This would initilaize and run the application in localhost:3000. Go to the browser and check if the application is up and running. An user registration form should show up.
-4. Run 'eb init' - This would initialize the applciation in your AWS Account. Select the Appropriate Region and Application Name. Enter "Y" for Node.js question and select the platform branch. You could opt No for CodeCommit and either create or select an existing kep pair for SSH.
-5. Run 'eb create' - This command would create the environment for your Elastic Beanstalk Application. Enter the environment name and DNS CNAME prefix and chose Application type as your load balancer. You could choose to enable spot fleet requests. This would create your environment.
-6. 'eb open' would open the web application in your default browser. 
-7. You could come back to this and update the .env file after creating the API's in the upcoming steps
+- Sample online banking flows (can be minimal / mock data):
+  - Login and logout.
+  - Dashboard / account summary.
+  - Transaction list.
+- Deployed using AWS Elastic Beanstalk with:
+  - Application Load Balancer.
+  - Auto Scaling.
+  - Encrypted database connection.
+- Production‑style operations:
+  - Operational KPIs and SLO‑like targets.
+  - CloudWatch dashboards and alarms.
+  - Runbooks for login outages and blue/green releases.
 
+---
 
-## NodeJS API's setup and deployment using elastic beanstalk multiple docker
+## Operational KPIs
 
-### Setup, containerize and upload the docker image of the service that updates the user information to DynamoDB
+These KPIs are used as targets to simulate how a real bank would operate its digital channels:
 
-1. 'cd api-db'
-2. Run 'aws ecr get-login-password --region <aws-region> | docker login --username AWS --password-stdin <xxxx.dkr.ecr.xxxxxx.amazonaws.com>' Update the region and ECR URL accordingly (Please check https://docs.aws.amazon.com/cli/latest/reference/ecr/get-login-password.html)
-3. Run 'docker build -t user-reg-db .'
-4. docker tag user-reg-db:latest <ecr-repo-uri-userregsnsxxx>:latest (https://docs.docker.com/engine/reference/commandline/tag/)
-5. docker push <ecr-repo-uri-userregsnsxxx>:latest
+| KPI                           | Target / Description                                                                |
+|-------------------------------|-------------------------------------------------------------------------------------|
+| Portal availability           | ≥ 99.5% monthly, based on ALB and environment health metrics                       |
+| Login p95 latency             | < 300–500 ms under normal demo load for `/login`                                   |
+| Account summary p95 latency   | < 500 ms for key read APIs (e.g., `/accounts`, `/transactions`)                    |
+| HTTP 5xx error rate           | < 0.5–1% over rolling 5‑minute windows for customer‑facing endpoints               |
+| CPU utilization               | Average < 60% on application instances to maintain headroom                        |
+| DB saturation                 | DB connections and I/O within safe thresholds, no sustained throttling or errors  |
 
+You can adjust the thresholds based on your own testing and environment size.
 
-### Setup, containerize and upload the docker image of the service that sends that publishes the email through SNS topic
+---
 
-1. 'cd api-sns'
-2. opne the file 
-2. Run 'aws ecr get-login-password --region <aws-region> | docker login --username AWS --password-stdin <aws-account-id>.dkr.ecr.<aws-region>.amazonaws.com' Update the region and ECR URL accordingly (Please check https://docs.aws.amazon.com/cli/latest/reference/ecr/get-login-password.html)
-3. Run 'docker build -t user-reg-sns .'
-4. docker tag user-reg-sns:latest <ecr-repo-uri-userregsnsxxx>:latest (https://docs.docker.com/engine/reference/commandline/tag/)
-5. docker push  <ecr-repo-uri-userregsnsxxx>:latest
+## Monitoring & Dashboards
 
-The above steps builds the containers of the services  and pushes the image to AWS ECR
+Monitoring is centered around Amazon CloudWatch, with alarms routed through SNS.
 
-### Create a Multi Docker Elastic BeanStalk Application that hosts the above two services as containers, whose images are hosted in ECR
+### Metrics and logs
 
-1. 'cd multi-docker'
-2. open '.ebextensions/settings.config' in an editor and update NewSignupEmail to an email that you could recieve emails to. This is the email that your SNS topic would be subscribed to.
-3. open 'Dockerrun.aws.json' and update the image URI's(image value in container definitions) for the two services. This would be the ECR Image URI's that was created in the previous steps.
-4. Run 'eb init'. Select the region, application. Input 'Y' for Docker question and select Multi-Container Docker option
-5. Run 'eb create' Select an environment, DNS name and select Application as load balancer. This would create the multi docker application
-6. Once the environment is created, a subscription confirmation email would be sent to the email address udpated in step 2.
+Key metrics:
 
-### Update the .env file in react app for connecting with the containerized services
+- **Application Load Balancer**
+  - `RequestCount`
+  - `TargetResponseTime`
+  - `HTTPCode_Target_4XX_Count`
+  - `HTTPCode_Target_5XX_Count`
+- **Elastic Beanstalk / EC2**
+  - CPU utilization
+  - (Optional) memory and disk via CloudWatch agent
+  - Environment health status
+- **RDS / DynamoDB**
+  - CPU utilization
+  - Database connections
+  - Throttled requests / IOPS (for DynamoDB)
+  - Free storage space (for RDS)
+- **Application logs**
+  - Structured logs in CloudWatch Logs with:
+    - Request path and method
+    - Correlation ID / request ID
+    - User ID (masked/anonymized if needed)
+    - Error messages and stack traces
 
-1. 'cd userreg-react-beanstalk'
-2. open the '.env' file and update the values of xxxxxxx with the DNS CNAME of the multi docker service created in the previous step(Please note that the URL's would be the same for both the services as they are deployed as docker containers in the same instance. This to enable extensibility in case if the services are deployed in different instances).
-3. Run 'eb deploy'
+### CloudWatch dashboards
 
-###  Test the app 
+Recommended dashboards (examples):
 
-Once the react app is deployed, run 'eb open' and test the app by entering the values in the form and hit register.
+- **“DigitalChannels-Health”**
+  - ALB request count, latency (p95), 4xx/5xx by endpoint group (e.g., login, dashboard).
+  - Environment health for the Beanstalk environment.
+  - High‑level availability widget (OK vs Alarm count).
 
-## Security
+- **“DigitalChannels-Backend”**
+  - RDS CPU, connections, read/write IOPS, free storage.
+  - DynamoDB capacity and throttles (if used).
+  - EC2/Beanstalk CPU, Auto Scaling group desired/actual instances.
 
-See [CONTRIBUTING](CONTRIBUTING.md#security-issue-notifications) for more information.
+### Alarms
 
-## License
+Examples of alarms (tune thresholds for your environment):
 
-This library is licensed under the MIT-0 License. See the LICENSE file.
+- `ALB-5XX-High` – 5xx error rate > 1% for 5 minutes.
+- `Login-Latency-High` – p95 `TargetResponseTime` for `/login` > 2s for 5 minutes.
+- `EB-Env-Health-Degraded` – environment health not **Green** for > 5 minutes.
+- `RDS-CPU-High` – CPU > 80% for 10 minutes.
+- `RDS-Connections-High` – connections near configured limit for sustained periods.
+
+All alarms should publish notifications to an SNS topic subscribed by the on‑call engineer (email/Slack/Teams integration).
+
+---
+
+## Runbooks (Operations Playbooks)
+
+This repository includes production‑style runbooks to demonstrate how incidents and changes are handled.
+
+- [`docs/runbook-login-outage.md`](docs/runbook-login-outage.md)  
+  Step‑by‑step procedure to detect, triage, mitigate, and review login outages or severe login degradation, including:
+  - Which CloudWatch metrics and logs to inspect.
+  - How to roll back recent changes or restart unhealthy components.
+  - Communication and post‑incident review steps.
+
+- [`docs/runbook-release-blue-green.md`](docs/runbook-release-blue-green.md)  
+  Blue/green release process for the portal on Elastic Beanstalk, covering:
+  - Preparing and validating a green environment.
+  - DNS / CNAME swap from blue to green.
+  - Observation window and rollback to blue if needed.
+  - Change documentation and lessons learned.
+
+These runbooks are written to mirror how a banking digital‑channels operations team would standardize procedures for high‑impact user journeys like login and releases.
+
+---
+
+## How this maps to Banking Digital Channels Operations
+
+Banks refer to “digital channels” as the ways customers interact with the bank digitally: online banking, mobile apps, digital wallets, ATMs, contact centers, and APIs.  
+This project focuses on the **online portal** part of that landscape and models how it would be run on AWS from an operations point of view.
+
+In particular:
+
+- The application simulates a simplified **online banking portal** where customers log in, view balances, and see transactions, similar to a real bank’s web and mobile front ends.
+- The **Operational KPIs** (availability, latency, error rate, saturation) mirror what digital‑channels ops teams care about for critical journeys like login and account overview.
+- The **monitoring and dashboards** show how to use CloudWatch metrics and logs to get real‑time visibility into channel health.
+- The **runbooks** demonstrate production‑style procedures for:
+  - Handling a login outage (one of the highest‑impact issues in digital channels).
+  - Safely rolling out new versions via blue/green deployment and rolling back if necessary.
+
+When referenced in a CV or portfolio, this project can be described as a small but realistic example of **operating a banking digital channel on AWS**, emphasizing both architecture and day‑2 operations.
+
+---
+
+## Getting Started (High-Level)
+
+> Adjust this section to match your actual tech stack and deployment scripts.
+
+1. **Clone the repository**
 
